@@ -35,7 +35,7 @@ public class PdfController {
                              body(new InputStreamResource(bis));
     }
 
-    @RequestMapping(value="/getpdf", method= RequestMethod.POST)
+    @PostMapping(value="/getpdf")
     public ResponseEntity<byte[]> getPDF(@RequestBody UserCV userCV) throws IOException {
 
         // generate the file
@@ -48,7 +48,7 @@ public class PdfController {
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         return ResponseEntity.ok().headers(headers).
-                             body(new byte[bis.available()]);
+                             body(bis.readAllBytes());
     }
 
 }

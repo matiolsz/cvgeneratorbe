@@ -123,35 +123,50 @@ public class PdfGenerator {
         PDPage myPage = new PDPage(myPageSize);
         document.addPage(myPage);
 
-        PDFont font = PDType1Font.HELVETICA_BOLD;
+//IMAGE
         PDPageContentStream contentStream = new PDPageContentStream(document, myPage);
         PDImageXObject image = PDImageXObject.createFromFile("D:\\projects\\cvgeneratorbe\\src\\main\\resources\\newtemplateimage.jpg", document);
         contentStream.drawImage(image, 0, 1650);
 
-//
+//BLUE RECT
         contentStream.setNonStrokingColor(new Color(31, 78, 121));
         contentStream.addRect(0, 1300, 1400, 350);
         contentStream.fill();
-
+//FOOTER
         contentStream.setNonStrokingColor(new Color(31, 78, 121));
         contentStream.addRect(0, 0, 1400, 100);
-        contentStream.fill();
+        contentStream.fill();//        START TEXT
 
-//      add text
+//        HEADER text
+        String textHeader = "Name - JOB ROLE";
+        PDFont fontHeader = PDType1Font.TIMES_BOLD;
+        int fontSizeHeader = 46;
+        int marginTopHeader = 400;
+        float titleWidth = fontHeader.getStringWidth(textHeader) / 1000 * fontSizeHeader;
+        float titleHeight = fontHeader.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSizeHeader;
         contentStream.beginText();
-        //Setting the font to the Content stream
-        contentStream.setFont(font, 20);
-        //Setting the position for the line
-        contentStream.newLineAtOffset(1000, 500);
-        String text = "Name";
-        //Adding text in the form of string
-        contentStream.showText(text);
-        //Ending the content stream
-        contentStream.endText();
+        contentStream.setFont(fontHeader, fontSizeHeader);
+        contentStream.newLineAtOffset((myPage.getMediaBox().getWidth() - titleWidth) / 2, myPage.getMediaBox().getHeight() - marginTopHeader - titleHeight);
+        contentStream.setNonStrokingColor(Color.WHITE);
+        contentStream.showText(textHeader);
 
+//        description
+        String textDesc = "description";
+        PDFont fontDesc = PDType1Font.TIMES_ROMAN;
+        int fontSize = 46;
+        int marginTop = 500;
+
+        float titleWidthDesc = fontDesc.getStringWidth(textHeader) / 1000 * fontSizeHeader;
+        float titleHeightDesc = fontDesc.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSizeHeader;
+        contentStream.setFont(fontDesc, fontSize);
+        contentStream.newLineAtOffset((myPage.getMediaBox().getWidth() - titleWidthDesc) / 2, myPage.getMediaBox().getHeight() - marginTop - titleHeightDesc);
+        contentStream.setNonStrokingColor(Color.WHITE);
+        contentStream.showText(textDesc);
+
+
+        contentStream.endText();
         contentStream.close();
         ByteArrayOutputStream b = new ByteArrayOutputStream();
-        document.save("src\\main\\resources\\pedeef.pdf");
         document.save(b);
         document.close();
         return new ByteArrayInputStream(b.toByteArray());
