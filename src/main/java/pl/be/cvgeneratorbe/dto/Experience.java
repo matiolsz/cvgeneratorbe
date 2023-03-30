@@ -7,13 +7,6 @@ public class Experience {
     String jobRole;
     String company;
     String timePeriod;
+    String description;
 
-    @Override
-    public String toString() {
-        return "Experience{" +
-                "jobRole='" + jobRole + '\'' +
-                ", company='" + company + '\'' +
-                ", timePeriod='" + timePeriod + '\'' +
-                '}';
-    }
 }

@@ -8,12 +8,4 @@ public class Education {
     String description;
     String period;
 
-    @Override
-    public String toString() {
-        return "Education{" +
-                "school='" + school + '\'' +
-                ", description='" + description + '\'' +
-                ", period='" + period + '\'' +
-                '}';
-    }
 }
