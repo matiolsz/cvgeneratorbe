@@ -8,5 +8,4 @@ public class Experience {
     String company;
     String timePeriod;
     String description;
-
 }

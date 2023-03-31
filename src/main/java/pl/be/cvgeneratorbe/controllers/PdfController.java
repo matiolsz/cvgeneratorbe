@@ -5,14 +5,11 @@ import java.io.IOException;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.be.cvgeneratorbe.dto.UserCV;
 import pl.be.cvgeneratorbe.service.PdfGenerator;
@@ -35,7 +32,7 @@ public class PdfController {
                              body(new InputStreamResource(bis));
     }
 
-    @RequestMapping(value="/getpdf", method= RequestMethod.POST)
+    @PostMapping(value="/getpdf")
     public ResponseEntity<byte[]> getPDF(@RequestBody UserCV userCV) throws IOException {
 
         // generate the file
@@ -48,7 +45,7 @@ public class PdfController {
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         return ResponseEntity.ok().headers(headers).
-                             body(new byte[bis.available()]);
+                             body(bis.readAllBytes());
     }
 
 }
