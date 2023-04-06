@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.multipart.MultipartFile;
 import pl.be.cvgeneratorbe.dto.DataBaseCV;
 import pl.be.cvgeneratorbe.dto.UserCV;
 import pl.be.cvgeneratorbe.service.CvService;
@@ -25,8 +27,8 @@ public class CvController {
     }
 
     @GetMapping
-    public ResponseEntity<UserCV> getCv(){
-        return ResponseEntity.ok(cvService.buildCV());
+    public ResponseEntity<UserCV> parseLinkedInResume(@RequestParam("file")MultipartFile file){
+        return ResponseEntity.ok(cvService.parseFromFile(file));
     }
 
     @PostMapping

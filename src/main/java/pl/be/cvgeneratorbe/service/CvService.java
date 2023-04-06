@@ -9,6 +9,7 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.FilteredEventListener;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStrategy;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import pl.be.cvgeneratorbe.dto.DataBaseCV;
 import pl.be.cvgeneratorbe.dto.Education;
 import pl.be.cvgeneratorbe.dto.Experience;
@@ -56,8 +57,8 @@ public class CvService {
         return DataBaseCV.of(saved);
     }
 
-    public UserCV buildCV() {
-        PdfDocument pdfDoc = openPdf();
+    public UserCV parseFromFile(MultipartFile file) {
+        PdfDocument pdfDoc = openPdf(file);
         Rectangle rect = new Rectangle(PageSize.A4);
 
         var schoolNamesFilter = new EducationNameFilter(rect);
@@ -158,10 +159,10 @@ public class CvService {
         return expList.get(0).getJobRole();
     }
 
-    private PdfDocument openPdf(){
+    private PdfDocument openPdf(MultipartFile file){
         PdfDocument pdfDoc = null;
         try {
-            pdfDoc = new PdfDocument(new PdfReader("cv4.pdf"));
+            pdfDoc = new PdfDocument(new PdfReader(file.getInputStream()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -173,10 +174,8 @@ public class CvService {
         LocationTextExtractionStrategy extractionStrategy = listener
                 .attachEventListener(new LocationTextExtractionStrategy(), filter);
         PdfCanvasProcessor parser = new PdfCanvasProcessor(listener);
-        String act = "";
         for (int i = 1; i <= pdfDocument.getNumberOfPages() ; i++) {
             parser.processPageContent(pdfDocument.getPage(i));
-            act = extractionStrategy.getResultantText();
         }
         return filter.getElements();
     }
