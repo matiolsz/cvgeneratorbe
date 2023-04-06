@@ -1,6 +1,7 @@
 package pl.be.cvgeneratorbe.dto;
 
 import lombok.Data;
+import pl.be.cvgeneratorbe.entity.EducationEntity;
 
 @Data
 public class Education {
@@ -14,6 +15,13 @@ public class Education {
         this.period = period;
     }
 
+
     public Education() {
+
+    }
+
+    public static Education of(EducationEntity education){
+        return new Education(education.getSchool(), education.getDescription(), education.getPeriod());
+
     }
 }
