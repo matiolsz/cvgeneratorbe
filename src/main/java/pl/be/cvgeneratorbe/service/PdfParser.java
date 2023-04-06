@@ -1,21 +1,31 @@
 package pl.be.cvgeneratorbe.service;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import pl.be.cvgeneratorbe.dto.Education;
 import pl.be.cvgeneratorbe.dto.Experience;
 import pl.be.cvgeneratorbe.dto.UserCV;
 
+@Service
 public class PdfParser {
 
-    public void parseLinkedInCv() throws IOException {
-        File file = new File("src/main/resources/cv.pdf");
+    public UserCV parseLinkedInCv(MultipartFile multipartFile) throws IOException {
+
+        File file = new File("src/main/resources/targetFile.tmp");
+        try (OutputStream os = new FileOutputStream(file)) {
+            os.write(multipartFile.getBytes());
+        }
+
         PDDocument document = PDDocument.load(file);
         PDFTextStripper stripper = new PDFTextStripper();
         String text = stripper.getText(document);
@@ -87,5 +97,6 @@ public class PdfParser {
         }
 
         document.close();
+        return userCV;
     }
 }

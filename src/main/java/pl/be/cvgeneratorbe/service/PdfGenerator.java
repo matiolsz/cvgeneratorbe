@@ -19,10 +19,12 @@ import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.springframework.stereotype.Service;
 import pl.be.cvgeneratorbe.dto.Education;
 import pl.be.cvgeneratorbe.dto.Experience;
 import pl.be.cvgeneratorbe.dto.UserCV;
 
+@Service
 public class PdfGenerator {
     public static ByteArrayInputStream generateFromOldTemplate(UserCV userCV) throws IOException {
         try (

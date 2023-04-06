@@ -12,7 +12,6 @@ public class UserCV {
     public String experience;
     public String typeOfProjects;
     public String technologyStack;
-
     public String overallDescription;
     public List<Education> educationList;
     public String languages;
