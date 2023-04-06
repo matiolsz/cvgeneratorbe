@@ -1,6 +1,7 @@
 package pl.be.cvgeneratorbe.dto;
 
 import lombok.Data;
+import pl.be.cvgeneratorbe.entity.ExperienceEntity;
 
 @Data
 public class Experience {
@@ -16,6 +17,11 @@ public class Experience {
         this.jobRole = jobRole;
         this.company = company;
         this.timePeriod = timePeriod;
+    }
+
+
+    public static Experience of(ExperienceEntity experience) {
+        return new Experience(experience.getJobRole(), experience.getCompany(), experience.getTimePeriod());
     }
 }
 
