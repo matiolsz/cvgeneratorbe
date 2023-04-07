@@ -26,9 +26,14 @@ public class CvController {
         this.cvService = cvService;
     }
 
-    @GetMapping
+    @GetMapping("/resume")
     public ResponseEntity<UserCV> parseLinkedInResume(@RequestParam("file")MultipartFile file){
-        return ResponseEntity.ok(cvService.parseFromFile(file));
+        return ResponseEntity.ok(cvService.parseFromResume(file));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserCV> parseLinkedInProfile(@RequestParam("file") MultipartFile file){
+        return ResponseEntity.ok(cvService.parseFromProfile(file));
     }
 
     @PostMapping

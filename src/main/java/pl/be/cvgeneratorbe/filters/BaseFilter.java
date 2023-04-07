@@ -27,7 +27,9 @@ public class BaseFilter extends TextRegionEventFilter {
         return isInBlock;
     }
 
-    public Boolean setBlock(TextRenderInfo renderInfo, String startBlock, String endBlock) {
+    public Boolean setBlock(TextRenderInfo renderInfo,
+                            String startBlock,
+                            String endBlock) {
         if (renderInfo.getText().equals(startBlock)) {
             this.isInBlock = true;
         }
@@ -37,7 +39,7 @@ public class BaseFilter extends TextRegionEventFilter {
         return isInBlock;
     }
 
-    Queue<String> elements = new LinkedList<>();
+    protected Queue<String> elements = new LinkedList<>();
 
     public BaseFilter(Rectangle filterRect) {
         super(filterRect);

@@ -15,14 +15,17 @@ import pl.be.cvgeneratorbe.dto.Education;
 import pl.be.cvgeneratorbe.dto.Experience;
 import pl.be.cvgeneratorbe.dto.UserCV;
 import pl.be.cvgeneratorbe.entity.CvEntity;
+import pl.be.cvgeneratorbe.filters.profile.NameSurnameFilter;
+import pl.be.cvgeneratorbe.filters.profile.ProfileExperienceCompanyNameFilter;
 import pl.be.cvgeneratorbe.filters.BaseFilter;
-import pl.be.cvgeneratorbe.filters.EducationDescriptionFilter;
-import pl.be.cvgeneratorbe.filters.EducationDurationFilter;
-import pl.be.cvgeneratorbe.filters.EducationNameFilter;
-import pl.be.cvgeneratorbe.filters.ExperienceCompanyNamesFilter;
-import pl.be.cvgeneratorbe.filters.ExperienceRoleFilter;
-import pl.be.cvgeneratorbe.filters.ExperienceTimeFilter;
-import pl.be.cvgeneratorbe.filters.SkillsFilter;
+import pl.be.cvgeneratorbe.filters.profile.ProfileExperienceRoleFilter;
+import pl.be.cvgeneratorbe.filters.resume.EducationDescriptionFilter;
+import pl.be.cvgeneratorbe.filters.resume.EducationDurationFilter;
+import pl.be.cvgeneratorbe.filters.resume.EducationNameFilter;
+import pl.be.cvgeneratorbe.filters.resume.ExperienceCompanyNamesFilter;
+import pl.be.cvgeneratorbe.filters.resume.ExperienceRoleFilter;
+import pl.be.cvgeneratorbe.filters.resume.ExperienceTimeFilter;
+import pl.be.cvgeneratorbe.filters.resume.SkillsFilter;
 import pl.be.cvgeneratorbe.repositories.CvRepository;
 
 import java.io.IOException;
@@ -45,7 +48,7 @@ public class CvService {
         this.cvRepository = cvRepository;
     }
 
-    public DataBaseCV saveCV(UserCV userCv){
+    public DataBaseCV saveCV(UserCV userCv) {
         var cvEntity = CvEntity.of(userCv);
 
         cvEntity.withCryptDecryptedName(cryptService.encrypt(cvEntity.getFullName()));
@@ -57,7 +60,7 @@ public class CvService {
         return DataBaseCV.of(saved);
     }
 
-    public UserCV parseFromFile(MultipartFile file) {
+    public UserCV parseFromResume(MultipartFile file) {
         PdfDocument pdfDoc = openPdf(file);
         Rectangle rect = new Rectangle(PageSize.A4);
 
@@ -70,21 +73,21 @@ public class CvService {
         var eduDatesFilter = new EducationDurationFilter(rect);
         var years = getElementsByFilter(pdfDoc, eduDatesFilter);
 
-        var nameAndSurname = getNameAndSurname(pdfDoc);
+        var nameAndSurname = getNameAndSurnameFromResume(pdfDoc);
 
         List<Education> eduList = new ArrayList<>();
         SkillsFilter skillsFilter = new SkillsFilter(rect);
-        var skills  = getElementsByFilter(pdfDoc, skillsFilter);
+        var skills = getElementsByFilter(pdfDoc, skillsFilter);
         var skillsApp = new ArrayList<>();
-        while (!skills.isEmpty()){
-            if (skills.peek().contains(nameAndSurname)){
+        while (!skills.isEmpty()) {
+            if (skills.peek().contains(nameAndSurname)) {
                 skills.poll();
             }
 
             skillsApp.add(skills.poll());
         }
 
-        while(!years.isEmpty()){
+        while (!years.isEmpty()) {
             eduList.add(new Education(names.poll(), degree.poll(), years.poll()));
         }
 
@@ -98,7 +101,7 @@ public class CvService {
 
     }
 
-    public List<Experience> extractExperience(PdfDocument pdfDoc, Rectangle rect){
+    public List<Experience> extractExperience(PdfDocument pdfDoc, Rectangle rect) {
         List<Experience> jobs = new ArrayList<Experience>();
 
         ExperienceRoleFilter roleFilter = new ExperienceRoleFilter(rect);
@@ -114,7 +117,7 @@ public class CvService {
         Queue<String> duration = getElementsByFilter(pdfDoc, dur);
 
 
-        while(!companyNames.isEmpty()){
+        while (!companyNames.isEmpty()) {
             var exp = new Experience(roles.poll(), companyNames.poll(), duration.poll());
             jobs.add(exp);
         }
@@ -122,20 +125,20 @@ public class CvService {
         return jobs;
     }
 
-    public String getFullExperience(List<Experience> experienceDtoList){
+    public String getFullExperience(List<Experience> experienceDtoList) {
         String monthLabel = "month";
         String yearLabel = "year";
 
         int year = 0;
         int month = 0;
 
-        for (Experience experience : experienceDtoList){
+        for (Experience experience : experienceDtoList) {
             var element = experience.getTimePeriod().substring(experience.getTimePeriod().indexOf("(") + 1, experience.getTimePeriod().indexOf(")")).split(" ");
-            if (element.length == 4){
+            if (element.length == 4) {
                 year += Integer.parseInt(element[0]);
                 month += Integer.parseInt(element[2]);
             }
-            if (element.length == 2){
+            if (element.length == 2) {
                 month += Integer.parseInt(element[0]);
             }
         }
@@ -152,14 +155,14 @@ public class CvService {
         return String.format("%s %s %s %s", year, yearLabel, month, monthLabel);
     }
 
-    public String extractLastRole(List<Experience> expList){
-        if (expList.size() == 0){
+    public String extractLastRole(List<Experience> expList) {
+        if (expList.size() == 0) {
             return "";
         }
         return expList.get(0).getJobRole();
     }
 
-    private PdfDocument openPdf(MultipartFile file){
+    private PdfDocument openPdf(MultipartFile file) {
         PdfDocument pdfDoc = null;
         try {
             pdfDoc = new PdfDocument(new PdfReader(file.getInputStream()));
@@ -174,34 +177,59 @@ public class CvService {
         LocationTextExtractionStrategy extractionStrategy = listener
                 .attachEventListener(new LocationTextExtractionStrategy(), filter);
         PdfCanvasProcessor parser = new PdfCanvasProcessor(listener);
-        for (int i = 1; i <= pdfDocument.getNumberOfPages() ; i++) {
+        for (int i = 1; i <= pdfDocument.getNumberOfPages(); i++) {
             parser.processPageContent(pdfDocument.getPage(i));
         }
         return filter.getElements();
     }
 
-    public String getNameAndSurname(PdfDocument pdfDoc) {
+    public String getNameAndSurnameFromResume(PdfDocument pdfDoc) {
         SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
         PdfCanvasProcessor proc = new PdfCanvasProcessor(strategy);
         proc.processPageContent(pdfDoc.getFirstPage());
-        System.out.println(strategy.getResultantText());
         return strategy.getResultantText().split(System.lineSeparator())[0];
     }
 
-    public List<DataBaseCV> findByNameAndSurname(String nameAndSurname){
+    public List<DataBaseCV> findByNameAndSurname(String nameAndSurname) {
         var cryptedNameAndSurname = cryptService.encrypt(nameAndSurname);
 
         List<CvEntity> matching = cvRepository.findByFullName(cryptedNameAndSurname);
-        if (matching.size() == 0){
+        if (matching.size() == 0) {
             return Collections.emptyList();
         }
         List<DataBaseCV> DbCvs = new ArrayList<>();
-        for (CvEntity cv : matching){
+        for (CvEntity cv : matching) {
             cv.setFullName(nameAndSurname);
             var cvDto = DataBaseCV.of(cv);
             DbCvs.add(cvDto);
         }
 
         return DbCvs;
+    }
+
+    public UserCV parseFromProfile(MultipartFile file) {
+        PdfDocument pdfDoc = openPdf(file);
+        Rectangle rect = new Rectangle(PageSize.A4);
+
+        var nameAndSurname = getNameAndSurnameFromProfile(pdfDoc);
+        ProfileExperienceCompanyNameFilter pecnf = new ProfileExperienceCompanyNameFilter(rect);
+        var v1 = getElementsByFilter(pdfDoc, pecnf);
+
+        System.out.println(v1);
+
+        ProfileExperienceRoleFilter perf = new ProfileExperienceRoleFilter(rect);
+        var role = getElementsByFilter(pdfDoc, perf);
+        System.out.println(role);
+
+
+        return new UserCV(nameAndSurname, null, null, null, null, null, null, null, null);
+    }
+
+    public String getNameAndSurnameFromProfile(PdfDocument document) {
+        FilteredEventListener listener = new FilteredEventListener();
+        LocationTextExtractionStrategy extractionStrategy = listener.attachEventListener(new LocationTextExtractionStrategy(), new NameSurnameFilter(new Rectangle(PageSize.A4)));
+        PdfCanvasProcessor parser = new PdfCanvasProcessor(listener);
+        parser.processPageContent(document.getFirstPage());
+        return extractionStrategy.getResultantText();
     }
 }

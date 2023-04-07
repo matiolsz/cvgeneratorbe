@@ -1,9 +1,10 @@
-package pl.be.cvgeneratorbe.filters;
+package pl.be.cvgeneratorbe.filters.resume;
 
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.canvas.parser.EventType;
 import com.itextpdf.kernel.pdf.canvas.parser.data.IEventData;
 import com.itextpdf.kernel.pdf.canvas.parser.data.TextRenderInfo;
+import pl.be.cvgeneratorbe.filters.BaseFilter;
 
 public class EducationDescriptionFilter extends BaseFilter {
 

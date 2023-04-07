@@ -1,5 +1,7 @@
 package pl.be.cvgeneratorbe.configuration;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -34,6 +36,7 @@ public class DynamoDbConfig {
 
         var client = AmazonDynamoDBClientBuilder
                 .standard()
+                .withCredentials(new AwsLocalCredentialsProvider())
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(dbEndpoint, amazonDynamoDbRegion))
                 .build();
 
