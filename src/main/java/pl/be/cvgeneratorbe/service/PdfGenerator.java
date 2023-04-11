@@ -134,6 +134,7 @@ public class PdfGenerator {
         PDDocument document = new PDDocument();
         PDRectangle myPageSize = new PDRectangle(1400, 2000);
         PDPage myPage = new PDPage(myPageSize);
+        PDPage mySecondPage = new PDPage(myPageSize);
         document.addPage(myPage);
         PDType0Font font = PDType0Font.load(document, new File("src/main/resources/arial.ttf"));
         PDPageContentStream contentStream = new PDPageContentStream(document, myPage);
@@ -149,7 +150,7 @@ public class PdfGenerator {
 //FOOTER
         contentStream.setNonStrokingColor(new Color(248, 180, 132));
         contentStream.addRect(0, 0, 1400, 100);
-        contentStream.fill();//        START TEXT
+        contentStream.fill();
 
 //HEADER text
         createCenteredTextInPDF(contentStream, myPage, userCV.fullName + " - " + userCV.getRole(), 400, font, 46, Color.WHITE);
@@ -159,35 +160,54 @@ public class PdfGenerator {
 
         int height = 740;
 
-        createTextInPDF(contentStream, myPage, "Role: " + userCV.getRole(), height, font, 28, Color.BLACK);
+        createTextInPDF(contentStream, myPage, "Role: " + userCV.getRole(), height, font, 28, Color.BLACK, 180);
         height = height + 70;
 
-        createTextInPDF(contentStream, myPage, "Experience: " + userCV.getExperience(), height, font, 28, Color.BLACK);
+        createTextInPDF(contentStream, myPage, "Experience: " + userCV.getExperience(), height, font, 28, Color.BLACK, 180);
         height = height + 70;
 
-        createTextInPDF(contentStream, myPage, "Type of projects: " + userCV.getTypeOfProjects(), height, font, 28, Color.BLACK);
+        createTextInPDF(contentStream, myPage, "Type of projects: " + userCV.getTypeOfProjects(), height, font, 28, Color.BLACK, 180);
         height = height + 70;
 
-        height = createWrappedText(contentStream, myPage, "Technology stack: " + userCV.getTechnologyStack(), font, 28, height);
+        height = createWrappedText(contentStream, myPage, "Technology stack: " + userCV.getTechnologyStack(), font, 28, height, 180);
         height = height + 70;
 
-        createTextInPDF(contentStream, myPage, "Education: ", height, font, 28, Color.BLACK);
+        createTextInPDF(contentStream, myPage, "Education: ", height, font, 28, Color.BLACK, 180);
         height = height + 70;
 
         for (Education education : userCV.getEducationList()) {
-            createTextOfDetailedExpInPDF(contentStream, myPage, "•  " + education.getSchool() + " - " + education.getDescription() + " (" + education.getPeriod() + ")", height, font, 28, Color.BLACK);
+            height = createWrappedText(contentStream, myPage, "•  " + education.getSchool() + " - " + education.getDescription() + " (" + education.getPeriod() + ")", font, 28, height, 250);
             height = height + 70;
         }
 
-        createTextInPDF(contentStream, myPage, "Languages: " + userCV.getLanguages(), height, font, 28, Color.BLACK);
+        createTextInPDF(contentStream, myPage, "Languages: " + userCV.getLanguages(), height, font, 28, Color.BLACK, 180);
         height = height + 70;
 
-        createTextInPDF(contentStream, myPage, "Detailed experience: ", height, font, 28, Color.BLACK);
+        createTextInPDF(contentStream, myPage, "Detailed experience: ", height, font, 28, Color.BLACK, 180);
         height = height + 70;
 
+        boolean secondPageAdded = false;
         for (Experience experience : userCV.getDetailedExperienceList()) {
-            createTextOfDetailedExpInPDF(contentStream, myPage, "•  " + experience.getJobRole() + " - " + experience.getCompany() + " (" + experience.getTimePeriod() + ")", height, font, 28, Color.BLACK);
-            height = height + 70;
+            if(height>1800){
+                contentStream.close();
+                document.addPage(mySecondPage);
+                secondPageAdded = true;
+                height = 150;
+                contentStream = new PDPageContentStream(document, mySecondPage);
+
+                //FOOTER
+                contentStream.setNonStrokingColor(new Color(248, 180, 132));
+                contentStream.addRect(0, 0, 1400, 100);
+                contentStream.fill();
+            }
+            if(secondPageAdded) {
+                height = createWrappedText(contentStream, mySecondPage, "•  " + experience.getJobRole() + " - " + experience.getCompany() + " (" + experience.getTimePeriod() + ")", font, 28, height, 250);
+                height = height + 70;
+            }
+            else {
+                height = createWrappedText(contentStream, myPage, "•  " + experience.getJobRole() + " - " + experience.getCompany() + " (" + experience.getTimePeriod() + ")", font, 28, height, 250);
+                height = height + 70;
+            }
         }
 
         contentStream.close();
@@ -197,10 +217,10 @@ public class PdfGenerator {
         return new ByteArrayInputStream(b.toByteArray());
     }
 
-    public static void createTextInPDF(PDPageContentStream contentStream, PDPage myPage, String text, int marginTop, PDFont font, int fontSize, Color color) throws IOException {
+    public static void createTextInPDF(PDPageContentStream contentStream, PDPage myPage, String text, int marginTop, PDFont font, int fontSize, Color color, int leftMargin) throws IOException {
         contentStream.beginText();
         contentStream.setFont(font, fontSize);
-        contentStream.newLineAtOffset(180, myPage.getMediaBox().getHeight() - marginTop);
+        contentStream.newLineAtOffset(leftMargin, myPage.getMediaBox().getHeight() - marginTop);
         contentStream.setNonStrokingColor(color);
         contentStream.showText(text);
         contentStream.endText();
@@ -212,15 +232,6 @@ public class PdfGenerator {
         contentStream.beginText();
         contentStream.setFont(font, fontSize);
         contentStream.newLineAtOffset((myPage.getMediaBox().getWidth() - titleWidth) / 2, myPage.getMediaBox().getHeight() - marginTop - titleHeight);
-        contentStream.setNonStrokingColor(color);
-        contentStream.showText(text);
-        contentStream.endText();
-    }
-
-    public static void createTextOfDetailedExpInPDF(PDPageContentStream contentStream, PDPage myPage, String text, int marginTop, PDFont font, int fontSize, Color color) throws IOException {
-        contentStream.beginText();
-        contentStream.setFont(font, fontSize);
-        contentStream.newLineAtOffset(250, myPage.getMediaBox().getHeight() - marginTop);
         contentStream.setNonStrokingColor(color);
         contentStream.showText(text);
         contentStream.endText();
@@ -246,7 +257,7 @@ public class PdfGenerator {
         }
     }
 
-    public static int createWrappedText(PDPageContentStream contentStream, PDPage myPage, String text, PDFont font, int fontSize, int height) throws IOException {
+    public static int createWrappedText(PDPageContentStream contentStream, PDPage myPage, String text, PDFont font, int fontSize, int height, int leftMargin) throws IOException {
         if (!StringUtils.isEmpty(text)) {
             int paragraphWidth = 1000;
             int start = 0;
@@ -255,13 +266,13 @@ public class PdfGenerator {
             for (int i : possibleWrapPoints(text)) {
                 float width = font.getStringWidth(text.substring(start, i)) / 1000 * fontSize;
                 if (start < end && width > paragraphWidth) {
-                    createTextInPDF(contentStream, myPage, text.substring(start, end), height, font, fontSize, Color.BLACK);
+                    createTextInPDF(contentStream, myPage, text.substring(start, end), height, font, fontSize, Color.BLACK, leftMargin);
                     height += font.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * fontSize;
                     start = end;
                 }
                 end = i;
             }
-            createTextInPDF(contentStream, myPage, text.substring(start, end), height, font, fontSize, Color.BLACK);
+            createTextInPDF(contentStream, myPage, text.substring(start, end), height, font, fontSize, Color.BLACK, leftMargin);
             return height;
         }
         return 0;
