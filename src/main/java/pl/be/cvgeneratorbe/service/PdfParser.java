@@ -31,6 +31,8 @@ public class PdfParser {
         String text = stripper.getText(document);
         String[] array = text.split("\n");
 
+        System.out.println(text);
+
         UserCV userCV = new UserCV();
         ArrayList<Experience> experience = new ArrayList<>();
         ArrayList<Education> educationList = new ArrayList<>();
@@ -42,7 +44,7 @@ public class PdfParser {
                                               .filter(i -> array[i].contains("Summary"))
                                               .findFirst().orElse(-1);
         int startIndexOfExperience = IntStream.range(0, array.length)
-                                              .filter(i -> array[i].equals("Experience"))
+                                              .filter(i -> array[i].strip().equals("Experience"))
                                               .findFirst().orElse(-1);
         int startIndexOfEducation = IntStream.range(0, array.length)
                                              .filter(i -> array[i].contains("Education"))
@@ -118,7 +120,7 @@ public class PdfParser {
 
             if (skills.size() > 1) {
                 for (String skill : skills) {
-                    stringBuilder.append(skill.replaceAll("[^A-Za-z0-9]", "") + ", ");
+                    stringBuilder.append(skill.replaceAll("[^A-Za-z0-9]", "")).append(", ");
                 }
                 stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length() - 1);
                 userCV.setTechnologyStack(stringBuilder.toString());
