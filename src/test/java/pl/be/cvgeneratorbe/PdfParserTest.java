@@ -24,22 +24,27 @@ public class PdfParserTest {
         MultipartFile multipartFileToSend = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
         UserCV userCv = pdfParser.parseLinkedInCv(multipartFileToSend);
 
-        System.out.println("000000000000FULLNAME");
+        System.out.println("000000000000000000000000000000000000FULLNAME");
         System.out.println(userCv.getFullName());
-        System.out.println("000000000000ROLE");
+
+        System.out.println("000000000000000000000000000000000000OverallDescription");
+        System.out.println(userCv.getOverallDescription());
+
+        System.out.println("000000000000000000000000000000000000ROLE");
         System.out.println(userCv.getRole());
-        System.out.println("000000000000EXPERIENCE");
+
+        System.out.println("000000000000000000000000000000000000LISTOFEXPERIENCE");
         if(userCv.getDetailedExperienceList()!=null) {
             for (Experience experience : userCv.getDetailedExperienceList()) {
                 System.out.println(experience.getJobRole());
+                System.out.println(experience.getCompany());
                 System.out.println(experience.getTimePeriod());
                 System.out.println(experience.getDescription());
-                System.out.println(experience.getCompany());
                 System.out.println("--------------");
             }
         }
 
-        System.out.println("000000000000EDUCATION");
+        System.out.println("000000000000000000000000000000000000EDUCATION");
         if(userCv.getEducationList()!=null) {
             for (Education education : userCv.getEducationList()) {
                 System.out.println(education.getSchool());
@@ -49,7 +54,7 @@ public class PdfParserTest {
             }
         }
 
-
+        System.out.println("000000000000000000000000000000000000TECHSTACK");
         System.out.println(userCv.technologyStack);
     }
 }

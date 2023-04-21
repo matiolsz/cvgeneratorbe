@@ -13,12 +13,18 @@ public class Experience {
     public Experience() {
     }
 
+    public Experience(String jobRole, String company, String timePeriod, String description) {
+        this.jobRole = jobRole;
+        this.company = company;
+        this.timePeriod = timePeriod;
+        this.description = description;
+    }
+
     public Experience(String jobRole, String company, String timePeriod) {
         this.jobRole = jobRole;
         this.company = company;
         this.timePeriod = timePeriod;
     }
-
 
     public static Experience of(ExperienceEntity experience) {
         return new Experience(experience.getJobRole(), experience.getCompany(), experience.getTimePeriod());
