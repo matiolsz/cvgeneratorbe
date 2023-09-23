@@ -3,7 +3,6 @@ package pl.be.cvgeneratorbe.controllers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -62,7 +61,7 @@ public class PdfController {
 
     @PostMapping(value = "/parsecv")
     public ResponseEntity<UserCV> parseCv(@RequestParam("file") MultipartFile file) throws IOException {
-        UserCV userCV = pdfParser.parseLinkedInCv(file);
+        UserCV userCV = pdfParser.parseLinkedInResume(file);
         return ResponseEntity.status(HttpStatus.OK).body(userCV);
     }
 }

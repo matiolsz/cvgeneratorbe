@@ -18,7 +18,7 @@ import pl.be.cvgeneratorbe.dto.UserCV;
 @Service
 public class PdfParser {
 
-    public UserCV parseLinkedInCv(MultipartFile multipartFile) throws IOException {
+    public UserCV parseLinkedInResume(MultipartFile multipartFile) throws IOException {
 
         File file = new File("src/main/resources/targetFile.tmp");
         try (OutputStream os = new FileOutputStream(file)) {
@@ -30,7 +30,7 @@ public class PdfParser {
         String text = stripper.getText(document);
         String[] array = deletePageInfoFromString(text.split("\n"));
 
-//        System.out.println(text);
+//      System.out.println(text);
 
         UserCV userCV = new UserCV();
         ArrayList<Experience> experience = new ArrayList<>();
@@ -65,7 +65,7 @@ public class PdfParser {
             }
             userCV.setOverallDescription(stringBuilder.toString());
             if (stringBuilder.length() > 0) {
-                stringBuilder.delete(0, stringBuilder.length() - 1);
+                stringBuilder.delete(0, stringBuilder.length());
             }
         }
 
@@ -88,7 +88,7 @@ public class PdfParser {
                             deleteBrackets(array[j + 3]),
                             sbExpDesc.toString()));
 
-                    sbExpDesc.delete(0, sbExpDesc.length() - 1);
+                    sbExpDesc.delete(0, sbExpDesc.length());
 
                     j = j + i - 1;
                 } else {
@@ -149,7 +149,7 @@ public class PdfParser {
         }
 
 //        set role
-        if(!userCV.getDetailedExperienceList().isEmpty()){
+        if (!userCV.getDetailedExperienceList().isEmpty()) {
             userCV.setRole(userCV.getDetailedExperienceList().get(0).getJobRole());
         }
 
@@ -170,11 +170,14 @@ public class PdfParser {
         int[] indexesOfPageNumber = IntStream.range(0, array.length)
                                              .filter(i -> finalArray[i].contains("- page ")).toArray();
 
+        int pageDeletedCounter = 0;
         for (int indexToDelete : indexesOfPageNumber) {
+            indexToDelete = indexToDelete - pageDeletedCounter;
             for (int i = indexToDelete; i < array.length - 1; i++) {
                 array[i] = array[i + 1];
             }
             array = Arrays.copyOf(array, array.length - 1);
+            pageDeletedCounter++;
         }
 
         return array;

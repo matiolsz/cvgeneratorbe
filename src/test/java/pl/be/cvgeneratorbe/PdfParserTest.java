@@ -22,7 +22,7 @@ public class PdfParserTest {
         File file = new File("src/main/resources/cvpm.pdf");
         InputStream stream =  new FileInputStream(file);
         MultipartFile multipartFileToSend = new MockMultipartFile("file", file.getName(), MediaType.TEXT_HTML_VALUE, stream);
-        UserCV userCv = pdfParser.parseLinkedInCv(multipartFileToSend);
+        UserCV userCv = pdfParser.parseLinkedInResume(multipartFileToSend);
 
         System.out.println("000000000000000000000000000000000000FULLNAME");
         System.out.println(userCv.getFullName());
@@ -39,7 +39,8 @@ public class PdfParserTest {
                 System.out.println(experience.getJobRole());
                 System.out.println(experience.getCompany());
                 System.out.println(experience.getTimePeriod());
-                System.out.println(experience.getDescription());
+                System.out.print(experience.getDescription().replaceAll("\\r", ""));
+                System.out.println();
                 System.out.println("--------------");
             }
         }
