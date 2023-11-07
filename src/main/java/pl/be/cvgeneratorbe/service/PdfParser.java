@@ -27,7 +27,7 @@ public class PdfParser {
 
         PDDocument document = PDDocument.load(file);
         PDFStyledTextStripper stripper = new PDFStyledTextStripper();
-        String text = stripper.getText(document);
+        String text = stripper.getText(document).replaceAll("\r"," ");
         String[] array = deletePageInfoFromString(text.split("\n"));
 
 //      System.out.println(text);
@@ -136,13 +136,16 @@ public class PdfParser {
             {
                 skills.addAll(Arrays.asList(array[j + 1].split(" • ")));
                 j++;
-            } while (!array[j].contains(" • "));
+                if( j == array.length-1 ) break;
+            } while (array[j].contains(" • "));
         }
         skills.removeIf(s -> s.equals(""));
 
         if (skills.size() > 1) {
             for (String skill : skills) {
-                stringBuilder.append(formatString(skill)).append(", ");
+                if(!skill.replace("\u00a0","").isBlank()) {
+                    stringBuilder.append(formatString(skill.strip())).append(", ");
+                }
             }
             stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length() - 1);
             userCV.setTechnologyStack(stringBuilder.toString());

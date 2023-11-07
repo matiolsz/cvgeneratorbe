@@ -286,4 +286,10 @@ public class PdfGenerator {
             ret[i] = ret[i - 1] + split[i].length();
         return ret;
     }
+
+//    private static String getOverallDescription(String overallDescription){
+//        return (overallDescription.length()>250) ?
+//                overallDescription.substring(0, overallDescription.substring(0,250).lastIndexOf(" ")) :
+//                overallDescription;
+//    }
 }
